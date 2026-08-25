@@ -257,7 +257,7 @@ def call(Map configMap){
                 steps {
                     script {
                         // build job: '${COMPONENT}-cd',
-                        build job: '../${COMPONENT}-cd',
+                        build job: "../${COMPONENT}-cd",
                         parameters: [
                             string(
                                 name: 'appVersion',
