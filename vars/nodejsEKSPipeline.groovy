@@ -256,6 +256,7 @@ def call(Map configMap){
                 }
                 steps {
                     script {
+                        // build job: 'catalogue-cd',
                         build job: '../catalogue-cd',
                         parameters: [
                             string(
