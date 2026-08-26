@@ -28,12 +28,11 @@ def call(Map configMap){
 
         stages {
             
-            stage('Read package.json') {
+            stage('Read pom.xml') {
                 steps {
                     script {
-                        def packageJson = readJSON file: 'package.json'
-                        appVersion = packageJson.version
-                        echo "Package version: ${appVersion}"
+                        appVersion = readMavenPom().getVersion()
+                        echo "app version: ${appVersion}"
                     }
                 }
             }
@@ -41,10 +40,9 @@ def call(Map configMap){
             stage('Install Dependencies') {
                 steps {
                     script {
-                        sh """
-                            echo "Installing dependencies..."
-                            npm install
-                        """
+                    sh """
+                        mvn clean package 
+                    """
                     }
                 }
             }
@@ -249,7 +247,7 @@ def call(Map configMap){
                 }
             } */
 
-            /* stage('Trigger Deploy') {
+            stage('Trigger Deploy') {
                 when {
                     expression {
                         params.deploy
@@ -273,7 +271,7 @@ def call(Map configMap){
                         wait: false
                     }
                 }
-            } */
+            }
         }
 
         post {
