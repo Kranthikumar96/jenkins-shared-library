@@ -144,8 +144,45 @@ def call(Map configMap){
                                 echo "Pushing Docker image..."
                                 docker push \
                                     ${ACC_ID}.dkr.ecr.${REGION}.amazonaws.com/${PROJECT}/${COMPONENT}:${appVersion}
-                                aws ecr wait image-scan-complete --repository-name ${PROJECT}/${COMPONENT} --image-id imageTag=${appVersion} --region ${REGION}
                             """
+                        }
+                    }
+                }
+            }
+
+            stage('Wait for ECR Scan') {
+                steps {
+                    script {
+                        withAWS(credentials: 'aws-creds', region: REGION) {
+
+                            timeout(time: 5, unit: 'MINUTES') {
+                                waitUntil {
+                                    def status = sh(
+                                        script: """
+                                            aws ecr describe-image-scan-findings \
+                                            --repository-name ${PROJECT}/${COMPONENT} \
+                                            --image-id imageTag=${appVersion} \
+                                            --region ${REGION} \
+                                            --query 'imageScanStatus.status' \
+                                            --output text 2>/dev/null || true
+                                        """,
+                                        returnStdout: true
+                                    ).trim()
+
+                                    echo "ECR scan status: ${status}"
+
+                                    if (status == "COMPLETE") {
+                                        return true
+                                    }
+
+                                    if (status == "FAILED") {
+                                        error("ECR image scan failed")
+                                    }
+
+                                    sleep 10
+                                    return false
+                                }
+                            }
                         }
                     }
                 }
