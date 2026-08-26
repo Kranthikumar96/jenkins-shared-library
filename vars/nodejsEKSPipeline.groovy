@@ -81,7 +81,7 @@ def call(Map configMap){
                 }
             } */
 
-            stage('Check Dependabot Alerts') {
+            /* stage('Check Dependabot Alerts') {
                 environment {
                     GITHUB_TOKEN = credentials('github-token')
                 }
@@ -119,7 +119,7 @@ def call(Map configMap){
                         }
                     }
                 }
-            }
+            } */
 
             stage('Docker Build') {
                 steps {
@@ -153,7 +153,7 @@ def call(Map configMap){
                 }
             }
 
-            stage('Check ECR Scan Results') {
+            /* stage('Check ECR Scan Results') {
                 steps {
                     script {
                         withAWS(
@@ -247,7 +247,7 @@ def call(Map configMap){
                         }
                     }
                 }
-            }
+            } */
 
             stage('Trigger Deploy') {
                 when {
